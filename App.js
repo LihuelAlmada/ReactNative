@@ -1,13 +1,30 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import React, {useState} from 'react';
 import { StyleSheet, Text, View, Image, Button, TouchableOpacity, Touchable } from 'react-native';
-import alvaro from './assets/Captura.png'
+import * as ImagePicker from 'expo-image-picker';
+
 export default function App() {
+
+  const [selectedImage, setSelectedImage] = useState(null)
+
+  let openImagePickerAsync = async () => {
+    let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync()
+
+    if (permissionResult.granted === false) {
+      alert('Permission to access camara is required');
+      return;
+    }
+    const pickerResult = await ImagePicker.launchImageLibraryAsync()
+    if (pickerResult.cancelled === true) {
+      return;
+    }
+    setSelectedImage({ localUri: pickerResult.uri});
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Hola Alvaro</Text>
-      <Image source={{uri: 'https://picsum.photos/200/300'}} style={styles.image}/>
-      <Image source={alvaro} style={styles.image}/>
+      <Image source={{uri: selectedImage !== null ? selectedImage.localUri : 'https://picsum.photos/200/300'}} style={styles.image}/>
       <Button
         color="blue"
         title="Go!"
@@ -15,7 +32,7 @@ export default function App() {
       />
       <Text style={styles.title}>Puede generar un   </Text>
       <TouchableOpacity
-      onPress={()=> console.log("Hola!")}
+      onPress={openImagePickerAsync}
       >
         <Text style={styles.title}>reclamo</Text>
       </TouchableOpacity>
